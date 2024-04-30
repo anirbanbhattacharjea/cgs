@@ -1,0 +1,46 @@
+import matplotlib.pyplot as plt
+
+# Define Bresenham's line drawing algorithm function
+def bresenham_line(x0, y0, x1, y1):
+    dx = abs(x1 - x0)
+    dy = abs(y1 - y0)
+    sx = 1 if x0 < x1 else -1
+    sy = 1 if y0 < y1 else -1
+    err = dx - dy
+    
+    points = []
+    while True:
+        points.append((x0, y0))
+        
+        if x0 == x1 and y0 == y1:
+            break
+        
+        e2 = 2 * err
+        if e2 > -dy:
+            err -= dy
+            x0 += sx
+        if e2 < dx:
+            err += dx
+            y0 += sy
+            
+    return points
+
+# Define line coordinates
+x0, y0 = 1, 2
+x1, y1 = 8, 7
+
+# Apply Bresenham's algorithm
+points = bresenham_line(x0, y0, x1, y1)
+
+# Plot the line
+plt.figure(figsize=(8, 6))
+plt.plot([x0, x1], [y0, y1], color='blue', linestyle='-', marker='o', label='Original Line')
+for point in points:
+    plt.plot(point[0], point[1], color='blue', marker='o')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Bresenham\'s Line Drawing Algorithm')
+plt.grid(True)
+plt.legend()
+plt.axis('equal')
+plt.show()
