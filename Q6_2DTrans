@@ -1,0 +1,90 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define a square vertices (2D object)
+vertices = np.array([
+    [0, 0, 1],
+    [1, 0, 1],
+    [1, 1, 1],
+    [0, 1, 1]
+])
+
+# Define edges connecting vertices
+edges = [(0, 1), (1, 2), (2, 3), (3, 0)]
+
+# Plot original square
+def plot_square(vertices, color='blue'):
+    for edge in edges:
+        plt.plot([vertices[edge[0]][0], vertices[edge[1]][0]],
+                 [vertices[edge[0]][1], vertices[edge[1]][1]], color=color)
+
+plt.figure(figsize=(8, 8))
+plot_square(vertices)
+plt.title('Original Square')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.axis('equal')
+plt.grid(True)
+plt.show()
+
+# Homogeneous transformation matrices
+def translate(tx, ty):
+    return np.array([
+        [1, 0, tx],
+        [0, 1, ty],
+        [0, 0, 1]
+    ])
+
+def rotate(theta):
+    return np.array([
+        [np.cos(theta), -np.sin(theta), 0],
+        [np.sin(theta), np.cos(theta), 0],
+        [0, 0, 1]
+    ])
+
+def scale(sx, sy):
+    return np.array([
+        [sx, 0, 0],
+        [0, sy, 0],
+        [0, 0, 1]
+    ])
+
+# Apply transformations
+translation_matrix = translate(1, 1)
+rotation_matrix = rotate(np.pi/4)
+scaling_matrix = scale(0.5, 1.5)
+
+# Transform the square vertices
+translated_vertices = np.dot(vertices, translation_matrix.T)
+rotated_vertices = np.dot(vertices, rotation_matrix.T)
+scaled_vertices = np.dot(vertices, scaling_matrix.T)
+
+# Plot transformed squares
+plt.figure(figsize=(12, 12))
+
+plt.subplot(131)
+plot_square(translated_vertices, color='green')
+plt.title('Translated Square')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.axis('equal')
+plt.grid(True)
+
+plt.subplot(132)
+plot_square(rotated_vertices, color='red')
+plt.title('Rotated Square')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.axis('equal')
+plt.grid(True)
+
+plt.subplot(133)
+plot_square(scaled_vertices, color='purple')
+plt.title('Scaled Square')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.axis('equal')
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()
