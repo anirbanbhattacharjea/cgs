@@ -1,0 +1,82 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define the clipping window as a rectangle
+window = np.array([
+    [2, 1],
+    [8, 1],
+    [8, 6],
+    [2, 6]
+])
+
+# Define the polygon to be clipped
+polygon = np.array([
+    [1, 3],
+    [6, 7],
+    [4, 4],
+    [8, 3],
+    [5, 1],
+    [2, 5]
+])
+
+# Plot the original polygon and clipping window
+plt.figure(figsize=(8, 6))
+plt.plot(polygon[:, 0], polygon[:, 1], color='blue', linestyle='-', marker='o', label='Original Polygon')
+plt.plot(polygon[0][0], polygon[0][1], color='blue', marker='o')
+plt.plot(window[:, 0], window[:, 1], color='red', linestyle='-', marker='o', label='Clipping Window')
+plt.plot([window[0][0], window[-1][0]], [window[0][1], window[-1][1]], color='red')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Polygon Clipping using Sutherland-Hodgman Algorithm')
+plt.grid(True)
+plt.legend()
+plt.axis('equal')
+
+# Define the Sutherland-Hodgman algorithm function
+def clip_polygon(subject_polygon, clip_window):
+    output_polygon = subject_polygon
+    for i in range(len(clip_window)):
+        input_polygon = output_polygon
+        output_polygon = []
+        clip_edge_start = clip_window[i]
+        clip_edge_end = clip_window[(i + 1) % len(clip_window)]
+        for j in range(len(input_polygon)):
+            point_current = input_polygon[j]
+            point_previous = input_polygon[j - 1]
+            if is_inside(point_current, clip_edge_start, clip_edge_end):
+                if not is_inside(point_previous, clip_edge_start, clip_edge_end):
+                    intersection_point = compute_intersection(point_previous, point_current, clip_edge_start, clip_edge_end)
+                    output_polygon.append(intersection_point)
+                output_polygon.append(point_current)
+            elif is_inside(point_previous, clip_edge_start, clip_edge_end):
+                intersection_point = compute_intersection(point_previous, point_current, clip_edge_start, clip_edge_end)
+                output_polygon.append(intersection_point)
+    return output_polygon
+
+# Define functions to check if a point is inside a line segment and compute the intersection point
+def is_inside(point, edge_start, edge_end):
+    return (edge_end[0] - edge_start[0]) * (point[1] - edge_start[1]) > (edge_end[1] - edge_start[1]) * (point[0] - edge_start[0])
+
+def compute_intersection(point1, point2, edge_start, edge_end):
+    dx1 = point2[0] - point1[0]
+    dy1 = point2[1] - point1[1]
+    dx2 = edge_end[0] - edge_start[0]
+    dy2 = edge_end[1] - edge_start[1]
+    determinant = dx1 * dy2 - dy1 * dx2
+    if determinant == 0:
+        return None  # Parallel lines, no intersection
+    else:
+        t = ((edge_start[0] - point1[0]) * dy2 - (edge_start[1] - point1[1]) * dx2) / determinant
+        intersection_point = [point1[0] + t * dx1, point1[1] + t * dy1]
+        return intersection_point
+
+# Clip the polygon
+clipped_polygon = clip_polygon(polygon, window)
+
+# Plot the clipped polygon
+clipped_polygon.append(clipped_polygon[0])  # Connect the last point to the first point
+clipped_polygon = np.array(clipped_polygon)
+plt.plot(clipped_polygon[:, 0], clipped_polygon[:, 1], color='green', linestyle='-', marker='o', label='Clipped Polygon')
+plt.legend()
+
+plt.show()
