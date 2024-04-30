@@ -1,0 +1,80 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define a function to sort vertices by y-coordinate (bubble sort)
+def sort_vertices(vertices):
+    n = len(vertices)
+    for i in range(n):
+        for j in range(0, n-i-1):
+            if vertices[j][1] > vertices[j+1][1]:
+                vertices[j], vertices[j+1] = vertices[j+1], vertices[j]
+
+def find_intersections(vertices, y):
+    intersections = []
+    for i in range(len(vertices)):
+        j = (i + 1) % len(vertices)
+        if vertices[i][1] < y <= vertices[j][1] or vertices[j][1] < y <= vertices[i][1]:
+            if vertices[i][1] != vertices[j][1]:
+                x = (vertices[i][0] * (vertices[j][1] - y) + vertices[j][0] * (y - vertices[i][1])) / (vertices[j][1] - vertices[i][1])
+                intersections.append(x)
+    if intersections:  # Check if intersections list is not empty
+        return (int(min(intersections)), int(max(intersections)) + 1)
+    else:
+        return (0, 0)  # Return dummy values if no intersections found
+
+def scan_line_fill(vertices):
+    # Sort vertices by y-coordinate
+    sort_vertices(vertices)
+    
+    # Find minimum and maximum y-coordinates
+    min_y = min(vertices, key=lambda x: x[1])[1]
+    max_y = max(vertices, key=lambda x: x[1])[1]
+    
+    # Initialize an empty list to store scan lines
+    scan_lines = [[] for _ in range(max_y - min_y + 1)]
+    
+    # Fill the scan lines with intersection points
+    for y in range(min_y, max_y + 1):
+        intersections = find_intersections(vertices, y)
+        if intersections[1] > intersections[0]:  # Check if there are valid intersections
+            scan_lines[y - min_y] = list(range(intersections[0], intersections[1] + 1))
+    
+    # Fill the polygon using scan lines
+    filled_polygon = []
+    for y in range(len(scan_lines)):
+        x_values = scan_lines[y]
+        for i in range(0, len(x_values), 2):
+            if i + 1 < len(x_values):  # Ensure there are enough elements in x_values
+                filled_polygon.extend(list(range(x_values[i], x_values[i+1] + 1)))
+    
+    return filled_polygon
+
+
+
+# Define vertices of the polygon
+vertices = np.array([
+    [1, 1],
+    [4, 3],
+    [7, 1],
+    [5, 5],
+    [3, 5]
+])
+
+# Fill the polygon using scan line algorithm
+filled_polygon = scan_line_fill(vertices)
+
+# Plot the original polygon and the filled polygon
+plt.figure(figsize=(8, 6))
+plt.plot(vertices[:, 0], vertices[:, 1], color='blue', linestyle='-', marker='o', label='Original Polygon')
+plt.plot(vertices[0][0], vertices[0][1], color='blue', marker='o')
+for i in range(len(vertices)):
+    plt.text(vertices[i][0], vertices[i][1], f'{i}', fontsize=12)
+plt.plot([vertices[0][0], vertices[-1][0]], [vertices[0][1], vertices[-1][1]], color='blue')
+plt.fill(vertices[filled_polygon][:, 0], vertices[filled_polygon][:, 1], color='lightgray', label='Filled Polygon')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Polygon Filling using Scan Line Algorithm')
+plt.grid(True)
+plt.legend()
+plt.axis('equal')
+plt.show()
