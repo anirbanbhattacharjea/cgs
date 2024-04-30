@@ -1,0 +1,102 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Define a cube vertices
+vertices = np.array([
+    [0, 0, 0],
+    [1, 0, 0],
+    [1, 1, 0],
+    [0, 1, 0],
+    [0, 0, 1],
+    [1, 0, 1],
+    [1, 1, 1],
+    [0, 1, 1]
+])
+
+# Define edges connecting vertices
+edges = [
+    (0, 1), (1, 2), (2, 3), (3, 0),
+    (4, 5), (5, 6), (6, 7), (7, 4),
+    (0, 4), (1, 5), (2, 6), (3, 7)
+]
+
+# Apply transformations
+def translate(vertices, tx, ty, tz):
+    return vertices + [tx, ty, tz]
+
+def rotate_x(vertices, angle):
+    rotation_matrix = np.array([
+        [1, 0, 0],
+        [0, np.cos(angle), -np.sin(angle)],
+        [0, np.sin(angle), np.cos(angle)]
+    ])
+    return np.dot(vertices, rotation_matrix)
+
+def rotate_y(vertices, angle):
+    rotation_matrix = np.array([
+        [np.cos(angle), 0, np.sin(angle)],
+        [0, 1, 0],
+        [-np.sin(angle), 0, np.cos(angle)]
+    ])
+    return np.dot(vertices, rotation_matrix)
+
+def rotate_z(vertices, angle):
+    rotation_matrix = np.array([
+        [np.cos(angle), -np.sin(angle), 0],
+        [np.sin(angle), np.cos(angle), 0],
+        [0, 0, 1]
+    ])
+    return np.dot(vertices, rotation_matrix)
+
+def scale(vertices, sx, sy, sz):
+    return vertices * [sx, sy, sz]
+
+# Apply transformations to the cube
+vertices_translated = translate(vertices, 1, 2, 3)
+vertices_rotated_x = rotate_x(vertices, np.pi/4)
+vertices_rotated_y = rotate_y(vertices, np.pi/4)
+vertices_rotated_z = rotate_z(vertices, np.pi/4)
+vertices_scaled = scale(vertices, 1.5, 0.5, 2)
+
+# Plot 3D object
+fig = plt.figure(figsize=(12, 6))
+
+def plot_cube(ax, vertices, edges, color):
+    for edge in edges:
+        ax.plot3D([vertices[edge[0]][0], vertices[edge[1]][0]],
+                  [vertices[edge[0]][1], vertices[edge[1]][1]],
+                  [vertices[edge[0]][2], vertices[edge[1]][2]], color=color)
+
+# Plot original cube
+ax1 = fig.add_subplot(231, projection='3d')
+plot_cube(ax1, vertices, edges, 'blue')
+ax1.set_title('Original Cube')
+
+# Plot translated cube
+ax2 = fig.add_subplot(232, projection='3d')
+plot_cube(ax2, vertices_translated, edges, 'green')
+ax2.set_title('Translated Cube')
+
+# Plot rotated cube (X-axis)
+ax3 = fig.add_subplot(233, projection='3d')
+plot_cube(ax3, vertices_rotated_x, edges, 'red')
+ax3.set_title('Rotated Cube (X-axis)')
+
+# Plot rotated cube (Y-axis)
+ax4 = fig.add_subplot(234, projection='3d')
+plot_cube(ax4, vertices_rotated_y, edges, 'purple')
+ax4.set_title('Rotated Cube (Y-axis)')
+
+# Plot rotated cube (Z-axis)
+ax5 = fig.add_subplot(235, projection='3d')
+plot_cube(ax5, vertices_rotated_z, edges, 'orange')
+ax5.set_title('Rotated Cube (Z-axis)')
+
+# Plot scaled cube
+ax6 = fig.add_subplot(236, projection='3d')
+plot_cube(ax6, vertices_scaled, edges, 'cyan')
+ax6.set_title('Scaled Cube')
+
+plt.tight_layout()
+plt.show()
