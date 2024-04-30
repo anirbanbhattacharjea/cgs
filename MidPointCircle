@@ -1,0 +1,51 @@
+import matplotlib.pyplot as plt
+
+def draw_circle(radius):
+    x_center, y_center = 0, 0
+    x = radius
+    y = 0
+    p = 1 - radius
+
+    points = []
+    points.extend(plot_symmetric_points(x_center, y_center, x, y))
+
+    while x > y:
+        y += 1
+        if p <= 0:
+            p += 2 * y + 1
+        else:
+            x -= 1
+            p += 2 * y - 2 * x + 1
+        if x < y:
+            break
+        points.extend(plot_symmetric_points(x_center, y_center, x, y))
+
+    return points
+
+def plot_symmetric_points(x_center, y_center, x, y):
+    points = []
+    points.append((x_center + x, y_center + y))
+    points.append((x_center - x, y_center + y))
+    points.append((x_center + x, y_center - y))
+    points.append((x_center - x, y_center - y))
+    points.append((x_center + y, y_center + x))
+    points.append((x_center - y, y_center + x))
+    points.append((x_center + y, y_center - x))
+    points.append((x_center - y, y_center - x))
+    return points
+
+def plot_circle(radius):
+    points = draw_circle(radius)
+    x = [point[0] for point in points]
+    y = [point[1] for point in points]
+    plt.scatter(x, y, color='blue',s=0.7)
+    plt.axis('equal')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title('Midpoint Circle Generation Algorithm')
+    plt.grid(True)
+    plt.show()
+
+# Example usage
+radius = 10000
+plot_circle(radius)
